@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+                        
+<!-- 네임스페이스(사용영역) 설정 -->
+<mapper namespace="com.ezen.mybatis.domain.employee.mapper.MemberDao">
+	
+	<!-- select 태그를 이용하여 전체사원 조회를 위한 SQL 매핑 -->
+	<!--<select id="findAll" resultType="com.ezen.mybatis.domain.employee.dto.Employee" > -->
+	<select id="findAll" resultType="com.ezen.mybatis.domain.employee.dto.Member" > <!-- resultType 이름 너무길면 mybatis-3-config에 별칭등록해서쓰기,등록도해주기 -->
+		SELECT mbember_id                 AS "id", <!--DB에 저장된이름써야함, beam객체랑 일치시켜주기위해 AS별칭으로 통일, 테이블이름은 웬만하면 단수형으로 쓰기 -->
+		       name                       AS "name", <!-- 일치하면 안써줘도됨 -->
+		       email                      AS "email" 
+		FROM   member
+		ORDER  BY name ASC
+	</select>
+	
+	<!-- 사원번호로 사원 조회 -->
+	<select id="findById"  parameterType="java.lang.Integer" resultType="Employee">
+	<!-- <select id="findById"  parameterType="java.lang.Integer" resultType="Employee"> -->
+		SELECT employee_id                      "id", 
+		       first_name                       "firstName", 
+		       last_name                        "lastName", 
+		       email                            "email", 
+		       phone_number                     "phoneNumber", 
+		       TO_CHAR(hire_date, 'YYYY-MM-DD') "hireDate", 
+		       salary                           "salary" 
+		FROM   employees 
+		WHERE  employee_id = #{value} 
+	</select>
+	
+	<!-- 사원 급여 조회 -->
+	<select id="findBySalary"  parameterType="int" resultType="int"> <!-- parmater타입을 int인지 double인지 꼭 알려줘야함 -->
+		SELECT salary
+		FROM   employees
+		WHERE  employee_id = #{value}
+	</select>
+	
+	<!-- 급여범위로 사원 검색 -->
+	<select id="findBySalaryRange"  parameterType="map" resultType="Employee"> <!-- java.util.map이 풀네임인데 별칭으로 등록되있어서 map으로만 가능 -->
+		SELECT employee_id                      "id", 
+		       first_name                       "firstName", 
+		       last_name                        "lastName", 
+		       email                            "email", 
+		       phone_number                     "phoneNumber", 
+		       TO_CHAR(hire_date, 'YYYY-MM-DD') "hireDate", 
+		       salary                           "salary" 
+		FROM   employees 
+		WHERE  salary BETWEEN #{min} AND #{max} 
+		<!-- WHERE salary &gt;= #{min} AND salary &lt;= #{max} --> <!-- >=(꺽새)못씀,&gt로써야함 문법에러 -->
+	</select>
+	
+	<!-- 성(last_name)으로 사원 와일드카드 검색(like 검색) -->
+	<select id="findByLastName"  parameterType="string" resultType="Employee"> <!--java.lang.string인데 string으로 별칭등록  -->
+		SELECT employee_id                      "id", 
+		       first_name                       "firstName", 
+		       last_name                        "lastName", 
+		       email                            "email", 
+		       phone_number                     "phoneNumber", 
+		       TO_CHAR(hire_date, 'YYYY-MM-DD') "hireDate", 
+		       salary                           "salary" 
+		FROM   employees 
+		WHERE  UPPER(last_name) LIKE #{lastName} 
+	</select>
+	
+	<!-- HashMap을 이용한 검색 : 조인 시 사용 -->
+	<select id="findByJoin"   resultType="map">
+		SELECT e.employee_id     "id", 
+		       e.first_name      "firstName", 
+		       e.last_name       "lastName", 
+		       d.department_name "departmentName" 
+		FROM   employees e 
+		       JOIN departments d 
+		         ON e.department_id = d.department_id 
+	</select>
+	
+	<!-- 자주 사용되고, 자바빈의 속성이름과 테이블 컬럼이름이 다른 경우 resultMap 선언 -->
+	<resultMap  id="employee" type="com.ezen.mybatis.domain.employee.dto.Employee">
+		<result property="id"           column="employee_id"/>
+		<result property="email"        column="email"/>
+		<result property="phoneNumber"  column="phone_number"/>
+		<result property="hireDate"     column="hire_date"/>
+	</resultMap>
+	
+	<!-- 전체사원 조회 -->
+	<select id="findByAll2" resultMap="employee"> <!-- 위에서 사용헀던 AS 별칭등록으로 사용해도되고 자주쓰이면 이렇게 매핑해서 써도됨 -->
+		SELECT employee_id, 
+		       email, 
+		       phone_number, 
+		       TO_CHAR(hire_date, 'YYYY-MM-DD') "hire_date"
+		FROM   employees
+		ORDER BY hire_date ASC
+	</select>
+	
+	<!-- 사원 등록 -->
+	<insert id="create" parameterType="Employee">
+		INSERT INTO employees 
+		            (employee_id,  <!-- 이렇게 속성하나당 한 컬럼씩써주는게 가독성면에서 좋음 -->
+		             first_name, 
+		             last_name, 
+		             email, 
+		             phone_number, 
+		             hire_date, 
+		             job_id, 
+		             salary, 
+		             manager_id, 
+		             department_id) 
+		VALUES     (employees_seq.nextval, 
+		            #{firstName}, 
+		            #{lastName}, 
+		            #{email}, 
+		            #{phoneNumber}, 
+		            TO_DATE(#{hireDate}, 'YYYY-MM-DD'), 
+		            #{jobId}, 
+		            #{salary}, 
+		            #{managerId}, 
+		            #{departmentId})
+	</insert>
+		
+	<!-- 사원 정보 수정 -->
+	<update id="update" parameterType="Employee">
+		UPDATE employees
+		SET    salary = #{salary}
+		<!-- 여기에 동적으로 들어올수있음, Employee에 수정할 값이 있어야만 가능,밑에 사원정보수정예제참고 -->
+		WHERE  employee_id = #{id}
+	</update>
+	
+	<!-- 사원 정보 수정(set, if 태그를 이용한 동적 SQL) -->
+	<update id="update2" parameterType="Employee">
+		UPDATE employees
+	<!--  	SET first_name = #{firstName}, 밑에 set태그가 true면 자동으로 생성해줌, null인 값들만 빼고 업데이트됨, 동적으로 쓸수있는 장점!!!!!!, sql ?로 동적으로 쓰는거랑 비슷
+			last_name = #{lastName},
+			salary = #{salary},
+			-->
+		<set>
+	        <if test="firstName != null">first_name = #{firstName},</if>
+	        <if test="lastName != null">last_name = #{lastName},</if>
+	        <if test="salary != null">salary = #{salary}</if>
+	    </set>
+	    WHERE employee_id = #{id}
+	</update>
+	
+	<!-- 사원 삭제 -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM employees
+		WHERE  employee_id = #{value}
+	</delete>
+	
+	<!-- 동적 SQL -->
+	<select id="search" parameterType="map" resultType="Employee">
+		SELECT employee_id  "id", 
+		       first_name   "firstName", 
+		       salary
+		FROM   employees
+		<if test="searchType != null">
+			<choose>
+				<when test="searchType == 'id'">
+				WHERE employee_id = #{searchValue}
+				</when>
+				<when test="searchType == 'name'">
+				WHERE first_name like #{searchValue}
+				</when>
+				<otherwise></otherwise>
+			</choose>
+		</if>
+	</select>
+</mapper>
