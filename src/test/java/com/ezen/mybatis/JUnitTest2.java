@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@TestMethodOrder(MethodOrderer.MethodName.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class) //123순서(자주씀)
+//@TestMethodOrder(MethodOrderer.MethodName.class) //ABC순서
 public class JUnitTest2 {
 	@Test
 	@Order(3)

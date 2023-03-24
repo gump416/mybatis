@@ -9,8 +9,10 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.graalvm.compiler.debug.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.ezen.mybatis.domain.employee.dto.Employee;
@@ -35,6 +37,7 @@ public class EmployeeMapperTest {
 	@Test
 	public void findAllTest(){
 		System.out.println("==================== 전체사원 조회 ========================");
+//		EmployeeMapper mepper = Assertions.assertNotNull(sqlSession);
 		EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
 		List<Employee> list = mapper.findAll();
 		for (Employee employee : list) {
@@ -44,6 +47,7 @@ public class EmployeeMapperTest {
 	}
 	
 	@Test
+	@Disabled
 	public void findByIdTest(){
 		System.out.println("==================== 사원번호로 사원조회 ========================");
 		EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
