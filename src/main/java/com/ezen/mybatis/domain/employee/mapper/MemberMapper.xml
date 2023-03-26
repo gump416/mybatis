@@ -8,7 +8,7 @@
 	<!-- select 태그를 이용하여 전체사원 조회를 위한 SQL 매핑 -->
 	<!--<select id="findAll" resultType="com.ezen.mybatis.domain.employee.dto.Employee" > -->
 	<select id="findAll" resultType="com.ezen.mybatis.domain.employee.dto.Member" > <!-- resultType 이름 너무길면 mybatis-3-config에 별칭등록해서쓰기,등록도해주기 -->
-		SELECT mbember_id                 AS "id", <!--DB에 저장된이름써야함, beam객체랑 일치시켜주기위해 AS별칭으로 통일, 테이블이름은 웬만하면 단수형으로 쓰기 -->
+		SELECT mbember_id                 AS "id", <!--DB에 저장된이름써야함, bean객체랑 일치시켜주기위해 AS별칭으로 통일, 테이블이름은 웬만하면 단수형으로 쓰기 -->
 		       name                       AS "name", <!-- 일치하면 안써줘도됨 -->
 		       email                      AS "email" 
 		FROM   member

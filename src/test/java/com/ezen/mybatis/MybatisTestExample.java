@@ -81,7 +81,7 @@ public class MybatisTestExample {
 		System.out.println("==================== 부서명 포함 전체사원 조회(테이블 조인) ========================");
 		List<Map<String, Object>> list3 = sqlSession.selectList(namespace + ".findByJoin");
 		for (Map<String, Object> row : list3) {
-			BigDecimal empId = (BigDecimal) row.get("id"); //mybatic는 오라클만 쓰는게 아니기때문에 int형일때는 이런식으로
+			BigDecimal empId = (BigDecimal) row.get("id"); //mybatis는 오라클만 쓰는게 아니기때문에 int형일때는 이런식으로
 			String firstName = (String) row.get("firstName");
 			String lastName = (String) row.get("lastName");
 			String departmentName = (String) row.get("departmentName");
